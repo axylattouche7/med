@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen neuro-ophtalmologique interactif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#e8ddbf;
+  --cream-2:#dccba0;
+  --cream-3:#c2a877;
+  --ink:#1c160f;
+  --ink-soft:#5b4f3a;
+  --forest:#5c1f1c;
+  --forest-deep:#17130d;
+  --forest-soft:#8a6b52;
+  --gold:#c9932f;
+  --gold-soft:#e3b563;
+  --teal:#2f6a58;
+  --red:#b3402a;
+  --white:#f7f0da;
+  --shadow: 0 1px 0 rgba(28,22,15,0.08);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(28,22,15,0.035) 0px, rgba(28,22,15,0.035) 1px, transparent 1px, transparent 26px),
+    var(--cream);
+  color:var(--ink);
+  font-family:'Space Grotesk', sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+::selection{background:var(--gold);color:var(--forest-deep);}
+
+/* ---------- layout shell ---------- */
+.page{
+  max-width:1440px;
+  margin:0 auto;
+  padding:36px 24px 80px;
+}
+header.site-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  border-bottom:3px solid var(--ink);
+  padding-bottom:18px;
+  margin-bottom:28px;
+  flex-wrap:wrap;
+  position:relative;
+}
+.site-head h1{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:700;
+  font-size:clamp(26px,4vw,40px);
+  line-height:1.03;
+  margin:0 0 6px;
+  letter-spacing:-0.015em;
+}
+.site-head .sub{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12.5px;
+  color:var(--forest);
+  letter-spacing:0.02em;
+}
+.byline{
+  font-family:'JetBrains Mono', monospace;
+  font-size:11.5px;
+  color:var(--ink-soft);
+  text-align:right;
+  line-height:1.6;
+  min-width:170px;
+}
+
+/* ---------- tabs ---------- */
+.tabs{
+  display:flex;
+  gap:2px;
+  margin-bottom:26px;
+  border:2.5px solid var(--ink);
+  width:fit-content;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:0 2px 0 rgba(28,22,15,0.25);
+}
+.tab-btn{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:600;
+  font-size:15.5px;
+  background:var(--white);
+  color:var(--ink-soft);
+  border:none;
+  padding:11px 26px;
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+.tab-btn + .tab-btn{border-left:2.5px solid var(--ink);}
+.tab-btn:hover{background:var(--cream-2);}
+.tab-btn.active{background:var(--forest);color:var(--white);}
+.tab-btn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px;}
+
+.view{display:none;}
+.view.active{display:block;}
+
+/* ---------- main grid ---------- */
+.exam-grid{
+  display:grid;
+  grid-template-columns:230px 1fr 300px;
+  gap:22px;
+  align-items:start;
+}
+@media (max-width:980px){
+  .exam-grid{grid-template-columns:1fr;}
+  .path-list-col{order:2;}
+  .stage-card{order:1;}
+  .info-panel{order:3;}
+  .path-list{
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    gap:8px;
+    padding-bottom:6px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .path-group-label{display:none;}
+  .path-btn{
+    flex:0 0 auto;
+    max-width:180px;
+    white-space:normal;
+    margin-bottom:0;
+  }
+}
+@media (max-width:640px){
+  .page{padding:20px 14px 56px;}
+  .site-head{flex-direction:column;align-items:flex-start;gap:4px;}
+  .byline{text-align:left;min-width:0;}
+  .tabs{width:100%;}
+  .tab-btn{flex:1;padding:12px 10px;font-size:15px;}
+  .stage-controls{gap:8px;}
+  .ctl-group{width:100%;}
+  .ctl-btn{
+    padding:11px 13px;
+    font-size:12.5px;
+    flex:1;
+    min-width:0;
+    min-height:44px;
+  }
+  .ctl-label{width:100%;margin-right:0;margin-bottom:2px;}
+  .quiz-top{flex-direction:column;align-items:flex-start;}
+  .score-chip{align-self:flex-start;}
+  .opt-btn{min-height:46px;padding:12px 14px;}
+  .path-btn{min-height:40px;display:flex;align-items:center;}
+  .next-btn{width:100%;min-height:46px;}
+}
+
+/* ---------- pathology list (Apprendre) ---------- */
+.path-list{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.path-group-label{
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  letter-spacing:0.04em;
+  color:var(--forest-soft);
+  margin:0 0 6px 2px;
+}
+.path-btn{
+  display:block;
+  width:100%;
+  text-align:left;
+  background:var(--white);
+  border:2px solid var(--cream-3);
+  border-radius:2px;
+  padding:9px 11px;
+  font-family:'Space Grotesk', sans-serif;
+  font-size:14px;
+  color:var(--ink);
+  cursor:pointer;
+  margin-bottom:6px;
+  transition:border-color .15s ease, background .15s ease;
+  line-height:1.3;
+  box-shadow:0 2px 0 rgba(28,22,15,0.1);
+}
+.path-btn:hover{border-color:var(--forest-soft);}
+.path-btn.active{background:var(--forest);color:var(--white);border-color:var(--forest-deep);box-shadow:none;}
+.path-btn:focus-visible{outline:3px solid var(--gold);outline-offset:1px;}
+
+/* ---------- stage ---------- */
+.stage-card{
+  background-image:
+    radial-gradient(circle 4px at 14px 14px, var(--ink) 60%, transparent 62%),
+    radial-gradient(circle 4px at calc(100% - 14px) 14px, var(--ink) 60%, transparent 62%),
+    radial-gradient(circle 4px at 14px calc(100% - 14px), var(--ink) 60%, transparent 62%),
+    radial-gradient(circle 4px at calc(100% - 14px) calc(100% - 14px), var(--ink) 60%, transparent 62%);
+  background-color:var(--white);
+  background-repeat:no-repeat;
+  border:3px solid var(--ink);
+  border-radius:3px;
+  padding:24px 24px 18px;
+  box-shadow:0 4px 0 rgba(28,22,15,0.18);
+}
+.stage-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:520/400;
+  cursor:crosshair;
+  background:
+    radial-gradient(ellipse at 50% 36%, #2a2115 0%, #17130d 72%);
+  border:3px solid var(--forest-deep);
+  border-radius:6px;
+  box-shadow:
+    inset 0 0 0 2px rgba(201,147,47,0.3),
+    inset 0 0 34px rgba(0,0,0,0.55);
+  overflow:hidden;
+  touch-action:none;
+}
+.stage-wrap svg.face-svg{width:100%;height:100%;display:block;}
+.target-dot{
+  position:absolute;
+  width:16px;height:16px;
+  border:2px solid var(--gold);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  box-shadow:0 0 0 3px rgba(201,147,47,0.22);
+  transition:opacity .15s ease;
+}
+.target-dot::after{
+  content:"";
+  position:absolute;
+  inset:5px;
+  background:var(--gold);
+  border-radius:50%;
+}
+.target-dot.hidden{opacity:0;}
+
+.torch-icon{
+  position:absolute;
+  width:54px;height:54px;
+  transform:translate(-38%,-62%) rotate(-38deg);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .15s ease;
+}
+.torch-icon.show{opacity:1;}
+.torch-icon svg{width:100%;height:100%;overflow:visible;}
+.torch-beam{
+  transform-origin:0% 50%;
+  animation:torchFlicker 1.4s ease-in-out infinite;
+}
+.torch-glow{
+  animation:torchFlicker 1.4s ease-in-out infinite;
+}
+@keyframes torchFlicker{
+  0%,100%{opacity:0.55;}
+  50%{opacity:0.95;}
+}
+.stage-hint{
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  color:var(--ink-soft);
+  text-align:center;
+  margin:10px 0 0;
+}
+
+.stage-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:2px dashed var(--cream-3);
+}
+.ctl-btn{
+  font-family:'JetBrains Mono', monospace;
+  font-size:11.5px;
+  letter-spacing:0.01em;
+  background:var(--white);
+  border:2px solid var(--ink);
+  border-radius:2px;
+  padding:8px 12px;
+  cursor:pointer;
+  color:var(--ink);
+  transition:background .12s ease, color .12s ease, box-shadow .12s ease;
+  box-shadow:0 2px 0 var(--ink);
+}
+.ctl-btn:hover{background:var(--cream-2);}
+.ctl-btn.on{background:var(--gold);border-color:var(--forest-deep);color:var(--forest-deep);box-shadow:0 1px 0 var(--forest-deep);transform:translateY(1px);}
+.ctl-btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px;}
+.ctl-group{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.ctl-label{font-family:'JetBrains Mono', monospace;font-size:10.5px;color:var(--ink-soft);margin-right:2px;}
+
+/* ---------- info panel ---------- */
+.info-panel{
+  background:var(--forest-deep);
+  color:var(--cream);
+  border-radius:3px;
+  border:2px solid var(--ink);
+  padding:20px 20px 22px;
+  min-height:200px;
+}
+.info-panel h2{
+  font-family:'Space Grotesk', sans-serif;
+  font-weight:700;
+  font-size:19px;
+  margin:0 0 4px;
+  color:var(--white);
+  line-height:1.2;
+}
+.info-panel .cat{
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  color:var(--gold-soft);
+  letter-spacing:0.03em;
+  margin-bottom:16px;
+  display:block;
+}
+.info-block{margin-bottom:14px;}
+.info-block h3{
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  letter-spacing:0.04em;
+  color:var(--forest-soft);
+  margin:0 0 4px;
+  text-transform:none;
+}
+.info-block p{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:14px;
+  line-height:1.55;
+  margin:0;
+  color:var(--cream);
+}
+
+/* ---------- quiz specific ---------- */
+.quiz-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.score-chip{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12.5px;
+  background:var(--forest);
+  color:var(--white);
+  padding:7px 14px;
+  border-radius:2px;
+  border:2px solid var(--forest-deep);
+}
+.quiz-instructions{
+  font-family:'Space Grotesk', sans-serif;
+  font-size:15px;
+  color:var(--ink-soft);
+  margin:0 0 16px;
+  max-width:70ch;
+}
+.quiz-options{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:16px;
+}
+.opt-btn{
+  text-align:left;
+  font-family:'Space Grotesk', sans-serif;
+  font-size:14.5px;
+  background:var(--white);
+  border:2px solid var(--cream-3);
+  border-radius:2px;
+  padding:11px 14px;
+  cursor:pointer;
+  color:var(--ink);
+  box-shadow:0 2px 0 rgba(28,22,15,0.1);
+}
+.opt-btn:hover{border-color:var(--forest-soft);}
+.opt-btn:disabled{cursor:default;}
+.opt-btn.correct{background:#dbe9e1;border-color:var(--teal);box-shadow:none;}
+.opt-btn.wrong{background:#f2ddd4;border-color:var(--red);box-shadow:none;}
+.opt-btn:focus-visible{outline:3px solid var(--gold);outline-offset:1px;}
+.next-btn{
+  margin-top:16px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:12.5px;
+  background:var(--forest);
+  color:var(--white);
+  border:2px solid var(--forest-deep);
+  border-radius:2px;
+  padding:11px 20px;
+  cursor:pointer;
+  display:none;
+}
+.next-btn:hover{background:var(--forest-deep);}
+.feedback-banner{
+  font-family:'JetBrains Mono', monospace;
+  font-size:12.5px;
+  padding:10px 14px;
+  border-radius:2px;
+  margin-top:14px;
+  display:none;
+}
+.feedback-banner.correct{display:block;background:#dbe9e1;color:var(--teal);border:2px solid var(--teal);}
+.feedback-banner.wrong{display:block;background:#f2ddd4;color:var(--red);border:2px solid var(--red);}
+
+.search-bar{
+  margin-top:56px;
+  padding:18px 20px;
+  background:var(--white);
+  border:2px solid var(--ink);
+  border-radius:3px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  box-shadow:0 3px 0 rgba(28,22,15,0.15);
+}
+.search-bar #search-form{
+  display:flex;
+  flex:1;
+  min-width:220px;
+  gap:8px;
+}
+.search-bar input[type="text"]{
+  flex:1;
+  min-width:160px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:13px;
+  padding:9px 12px;
+  border:2px solid var(--cream-3);
+  border-radius:2px;
+  background:var(--cream);
+  color:var(--ink);
+}
+.search-bar input[type="text"]:focus{outline:none;border-color:var(--forest-soft);}
+.search-bar input[type="text"]::placeholder{color:var(--ink-soft);opacity:0.7;}
+.search-bar .ctl-btn{white-space:nowrap;}
+@media (max-width:640px){
+  .search-bar{flex-direction:column;align-items:stretch;margin-top:36px;}
+  .search-bar #search-form{flex-direction:column;}
+}
+
+footer.site-foot{
+  margin-top:24px;
+  padding-top:16px;
+  border-top:2px dashed var(--cream-3);
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  color:var(--ink-soft);
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-head">
+    <div>
+      <h1>Examen neuro-ophtalmologique</h1>
+      <div class="sub">simulateur interactif — motricité oculaire · pupilles · nystagmus</div>
+    </div>
+    <div class="byline">déplace le curseur (souris<br>ou doigt) dans la zone<br>pour fixer le regard du patient</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="apprendre">Apprendre</button>
+    <button class="tab-btn" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ================= APPRENDRE ================= -->
+  <section id="view-apprendre" class="view active">
+    <div class="exam-grid">
+      <div class="path-list-col">
+        <div class="path-list" id="path-list"></div>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-wrap" id="stage-a">
+          <svg class="face-svg" id="svg-a" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="target-dot" id="target-a" style="left:50%;top:38%;"></div>
+          <div class="torch-icon" id="torch-a" style="left:50%;top:38%;">
+            <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="tg-bulb-a"><stop offset="0%" stop-color="#fff8dd"/><stop offset="100%" stop-color="#ffcf5c"/></radialGradient>
+                <linearGradient id="tg-beam-a" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ffe9a8" stop-opacity="0.85"/><stop offset="100%" stop-color="#ffe9a8" stop-opacity="0"/></linearGradient>
+              </defs>
+              <polygon class="torch-beam" points="62,30 102,6 102,54" fill="url(#tg-beam-a)"/>
+              <rect x="4" y="20" width="34" height="20" rx="6" fill="#4a4a44"/>
+              <rect x="34" y="14" width="20" height="32" rx="5" fill="#6b6b62"/>
+              <circle class="torch-glow" cx="60" cy="30" r="11" fill="url(#tg-bulb-a)"/>
+            </svg>
+          </div>
+        </div>
+        <p class="stage-hint" id="hint-a">bouge le curseur pour la poursuite oculaire — amène-le près du bout du nez pour tester la convergence</p>
+        <div class="stage-controls">
+          <div class="ctl-group">
+            <span class="ctl-label">mode d'examen —</span>
+            <button class="ctl-btn on" data-mode="pursuit" id="mode-pursuit-a">poursuite oculaire</button>
+            <button class="ctl-btn" data-mode="lamp" id="mode-lamp-a">réflexe pupillaire (lampe)</button>
+          </div>
+          <div class="ctl-group">
+            <span class="ctl-label">ambiance —</span>
+            <button class="ctl-btn on" data-ambient="bright" id="amb-bright-a">pièce éclairée</button>
+            <button class="ctl-btn" data-ambient="dim" id="amb-dim-a">pièce sombre</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel" id="info-a"></div>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="view-quiz" class="view">
+    <div class="quiz-top">
+      <p class="quiz-instructions" id="quiz-vignette">Examine le patient, teste au besoin le réflexe pupillaire, puis choisis le diagnostic.</p>
+      <div class="score-chip" id="score-chip">score : 0 / 0</div>
+    </div>
+
+    <div class="exam-grid" style="grid-template-columns:1fr 300px;">
+      <div class="stage-card">
+        <div class="stage-wrap" id="stage-q">
+          <svg class="face-svg" id="svg-q" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="target-dot" id="target-q" style="left:50%;top:38%;"></div>
+          <div class="torch-icon" id="torch-q" style="left:50%;top:38%;">
+            <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="tg-bulb-q"><stop offset="0%" stop-color="#fff8dd"/><stop offset="100%" stop-color="#ffcf5c"/></radialGradient>
+                <linearGradient id="tg-beam-q" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ffe9a8" stop-opacity="0.85"/><stop offset="100%" stop-color="#ffe9a8" stop-opacity="0"/></linearGradient>
+              </defs>
+              <polygon class="torch-beam" points="62,30 102,6 102,54" fill="url(#tg-beam-q)"/>
+              <rect x="4" y="20" width="34" height="20" rx="6" fill="#4a4a44"/>
+              <rect x="34" y="14" width="20" height="32" rx="5" fill="#6b6b62"/>
+              <circle class="torch-glow" cx="60" cy="30" r="11" fill="url(#tg-bulb-q)"/>
+            </svg>
+          </div>
+        </div>
+        <p class="stage-hint" id="hint-q">bouge le curseur pour la poursuite oculaire — amène-le près du bout du nez pour tester la convergence</p>
+        <div class="stage-controls">
+          <div class="ctl-group">
+            <span class="ctl-label">mode d'examen —</span>
+            <button class="ctl-btn on" data-mode="pursuit" id="mode-pursuit-q">poursuite oculaire</button>
+            <button class="ctl-btn" data-mode="lamp" id="mode-lamp-q">réflexe pupillaire (lampe)</button>
+          </div>
+          <div class="ctl-group">
+            <span class="ctl-label">ambiance —</span>
+            <button class="ctl-btn on" data-ambient="bright" id="amb-bright-q">pièce éclairée</button>
+            <button class="ctl-btn" data-ambient="dim" id="amb-dim-q">pièce sombre</button>
+          </div>
+        </div>
+
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="feedback-banner" id="quiz-feedback"></div>
+        <button class="next-btn" id="quiz-next">question suivante →</button>
+      </div>
+
+      <div class="info-panel" id="info-q">
+        <h2>Ton diagnostic ?</h2>
+        <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;line-height:1.6;color:var(--cream);">Explore le regard et la pupille du patient avec la souris, puis sélectionne une réponse dans la liste à gauche. L'explication clinique apparaîtra ici une fois ta réponse soumise.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="search-bar">
+    <span class="ctl-label">en savoir plus —</span>
+    <form id="search-form">
+      <input type="text" id="search-input" placeholder="rechercher sur Google (ex. paralysie du III nerf oculomoteur)" autocomplete="off">
+      <button type="submit" class="ctl-btn">Rechercher</button>
+    </form>
+  </div>
+
+  <footer class="site-foot">simulateur pédagogique — les paramètres de motricité et de réflexe pupillaire sont simplifiés à des fins d'enseignement et ne remplacent pas un examen clinique réel. La recherche ouvre Google dans un nouvel onglet.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   PATHOLOGY MODEL
+   Screen convention: facing the patient. OD (œil droit du
+   patient) is drawn on screen-LEFT. OS (œil gauche) on screen-RIGHT.
+   abductionSign: the sign of horizontal displacement (x, -1..1)
+   that corresponds to ABDUCTION for that eye.
+     OD abductionSign = -1  (abduction = toward screen-left)
+     OS abductionSign = +1  (abduction = toward screen-right)
+   limits.{abduct,adduct,up,down} = fraction (0-1) of full range
+   allowed in that direction. baseline = resting deviation (x,y)
+   added even at primary gaze (e.g. paretic strabismus).
+   ============================================================ */
+
+function eyeDef(over){
+  return Object.assign({
+    limits:{abduct:1, adduct:1, up:1, down:1},
+    baseline:{ab:0, y:0}, // ab = abduction-relative offset (+ = abducted, - = adducted); y universal (+ = down)
+    ptosis:0.05,
+    afferentGain:1,
+    efferentOK:true,
+    dilatorGain:1,
+    fixedSize:null,
+    convergenceOK:true // false when the medial rectus itself is weak (III palsy) — convergence uses the same final common pathway as adduction there
+  }, over);
+}
+
+const PATHOLOGIES_BASE = {
+
+  normal: {
+    name:"Examen normal",
+    category:"Contrôle",
+    vignettes:[
+      "Patiente de 34 ans, examen des nerfs crâniens demandé dans le cadre d'un bilan systématique.",
+      "Étudiant en médecine de 24 ans, volontaire pour une démonstration de l'examen oculomoteur en laboratoire d'habiletés cliniques.",
+      "Homme de 45 ans, consultation de routine avant une chirurgie élective ; aucun symptôme visuel rapporté."
+    ],
+    OD: eyeDef({}),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Ductions et versions complètes dans les 9 positions cardinales du regard, sans restriction ni déviation.",
+      pupille:"Pupilles isocoriques, rondes, réactives directement et de façon consensuelle à la lumière.",
+      paupiere:"Fentes palpébrales symétriques, sans ptosis.",
+      convergence:"Convergence normale, myosis et rapprochement symétrique des deux globes en vision de près."
+    },
+    localisation:"—",
+    mecanisme:"Sert de référence pour comparer les autres tracés."
+  },
+
+  cn3_od: {
+    name:"Paralysie du III (nerf oculomoteur) droit, complète, avec atteinte pupillaire",
+    category:"Nerfs oculomoteurs",
+    vignettes:[
+      "Homme de 58 ans, céphalée brutale en coup de tonnerre suivie d'une diplopie et d'une chute de la paupière droite depuis 2 heures.",
+      "Femme de 62 ans, connue pour un anévrisme non traité, se présente pour une diplopie d'apparition rapide et une paupière tombante à droite, avec une pupille asymétrique notée par la famille.",
+      "Homme de 50 ans, traumatisme crânien il y a 6 heures suite à un accident de la route, présente maintenant une chute de la paupière droite et une pupille dilatée du même côté."
+    ],
+    OD: eyeDef({
+      limits:{abduct:1, adduct:0.05, up:0.05, down:0.3},
+      baseline:{ab:0.55, y:0.30},
+      ptosis:0.92,
+      efferentOK:false,
+      fixedSize:25,
+      convergenceOK:false
+    }),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Œil droit dévié en abduction et légèrement en dépression au repos (« down and out »). Adduction, élévation et dépression très limitées ; l'abduction (CN VI) est préservée. La convergence est également abolie (le droit médial est directement atteint, contrairement à l'OIN).",
+      pupille:"Mydriase droite fixe, aréactive à la lumière directe et consensuelle (efférence parasympathique interrompue). La pupille controlatérale reste normo-réactive.",
+      paupiere:"Ptosis complet à droite, couvrant l'axe visuel.",
+      convergence:"Convergence abolie du côté droit — le droit médial est directement paralysé, contrairement à l'OIN où la convergence est épargnée."
+    },
+    localisation:"Nerf crânien III (fascicule, trajet sous-arachnoïdien ou sinus caverneux).",
+    mecanisme:"Atteinte du III entraîne une paralysie des muscles droit médial, droit supérieur, droit inférieur, oblique inférieur, releveur de la paupière, et des fibres parasympathiques péri­phériques du sphincter irien. L'atteinte pupillaire associée oriente vers une cause compressive (ex. anévrisme de la communicante postérieure) — une urgence diagnostique devant tout III douloureux avec mydriase."
+  },
+
+  cn3_od_spared: {
+    name:"Paralysie du III droit avec épargne pupillaire",
+    category:"Nerfs oculomoteurs",
+    vignettes:[
+      "Homme diabétique de 61 ans, diplopie binoculaire et ptosis droit d'apparition progressive sur 24 heures, sans céphalée.",
+      "Femme hypertendue de 68 ans, diplopie et ptosis droit progressifs depuis 2 jours, sans douleur ni céphalée associée.",
+      "Homme de 55 ans, diabète de type 2 mal contrôlé, se plaint d'une vision double depuis hier et note que sa paupière droite tombe légèrement."
+    ],
+    OD: eyeDef({
+      limits:{abduct:1, adduct:0.1, up:0.15, down:0.35},
+      baseline:{ab:0.4, y:0.18},
+      ptosis:0.6,
+      convergenceOK:false
+    }),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Limitation marquée de l'adduction, de l'élévation et de la dépression de l'œil droit, abduction relativement préservée — même distribution qu'une paralysie complète du III. La convergence est aussi limitée.",
+      pupille:"Pupilles isocoriques et normo-réactives des deux côtés — le sphincter irien est épargné.",
+      paupiere:"Ptosis partiel à droite.",
+      convergence:"Convergence limitée du côté droit, dans la même mesure que l'adduction."
+    },
+    localisation:"Nerf crânien III, atteinte des fibres motrices centrales du nerf avec épargne des fibres parasympathiques périphériques.",
+    mecanisme:"Dans le nerf III, les fibres pupillomotrices parasympathiques circulent en périphérie du nerf, vascularisées par le plexus pial, alors que les fibres motrices somatiques sont plus centrales, vascularisées par les vasa nervorum. Une ischémie microvasculaire (diabète, hypertension) touche préférentiellement le centre du nerf et épargne la pupille, contrairement à une compression extrinsèque (anévrisme) qui écrase le nerf de l'extérieur vers l'intérieur et atteint la pupille en premier."
+  },
+
+  cn4_od: {
+    name:"Paralysie du IV (nerf trochléaire) droit",
+    category:"Nerfs oculomoteurs",
+    vignettes:[
+      "Femme de 45 ans, diplopie verticale et oblique en descendant les escaliers ou en lisant, présente depuis plusieurs semaines.",
+      "Homme de 38 ans, traumatisme crânien mineur il y a un mois, se plaint depuis d'une vision double en penchant la tête et en conduisant.",
+      "Femme de 52 ans, diplopie verticale intermittente, remarque qu'elle incline spontanément la tête pour mieux voir."
+    ],
+    OD: eyeDef({
+      limits:{abduct:1, adduct:1, up:1, down:0.35},
+      baseline:{ab:0, y:-0.16},
+      ptosis:0.05
+    }),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Limitation de la dépression de l'œil droit, surtout marquée en adduction. Hypertropie droite discrète en position primaire, qui s'accentue au regard controlatéral et à l'inclinaison de la tête vers l'épaule droite (test de Bielschowsky positif).",
+      pupille:"Normale, symétrique et réactive.",
+      paupiere:"Normale.",
+      convergence:"Convergence normale, non affectée par l'atteinte isolée de l'oblique supérieur."
+    },
+    localisation:"Nerf crânien IV, innervant le muscle oblique supérieur droit.",
+    mecanisme:"L'oblique supérieur abaisse, intorde et abduc­te légèrement l'œil ; sa perte se manifeste surtout par un défaut d'abaissement en adduction. Le patient adopte souvent une inclinaison compensatrice de la tête à l'opposé du côté atteint pour fusionner l'image."
+  },
+
+  cn6_od: {
+    name:"Paralysie du VI (nerf abducens) droit",
+    category:"Nerfs oculomoteurs",
+    vignettes:[
+      "Homme de 67 ans, hypertendu, diplopie horizontale binoculaire d'apparition brutale il y a 3 jours, pire en fin de journée.",
+      "Fillette de 8 ans, céphalées matinales et vomissements depuis 2 semaines, développe une diplopie horizontale ; l'imagerie révèle une hypertension intracrânienne.",
+      "Homme de 34 ans, suites d'une ponction lombaire il y a 5 jours pour une méningite, se plaint d'une vision double nouvelle en regardant sur le côté."
+    ],
+    OD: eyeDef({
+      limits:{abduct:0.12, adduct:1, up:1, down:1},
+      baseline:{ab:-0.25, y:0},
+      ptosis:0.05
+    }),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Abduction de l'œil droit très limitée ; ésotropie (déviation en dedans) en position primaire, maximale au regard vers la droite. Diplopie horizontale binoculaire s'aggravant au regard vers le côté atteint.",
+      pupille:"Normale.",
+      paupiere:"Normale.",
+      convergence:"Convergence normale — seul le droit latéral est atteint, le droit médial est intact."
+    },
+    localisation:"Nerf crânien VI, innervant le muscle droit latéral droit.",
+    mecanisme:"Le VI a le plus long trajet intracrânien des nerfs oculomoteurs, ce qui le rend vulnérable à l'hypertension intracrânienne (signe de fausse localisation) autant qu'aux causes microvasculaires, traumatiques ou compressives directes."
+  },
+
+  horner_od: {
+    name:"Syndrome de Horner droit",
+    category:"Voies pupillaires",
+    vignettes:[
+      "Femme de 52 ans, fumeuse, référée pour une asymétrie pupillaire notée sur des photos récentes, sans autre symptôme.",
+      "Homme de 60 ans, tabagique, douleur à l'épaule droite et perte de poids récente ; l'examen révèle une paupière légèrement tombante et une pupille plus petite à droite.",
+      "Femme de 29 ans, cervicalgie et céphalée après une manipulation chiropratique, présente une paupière discrètement abaissée et une pupille asymétrique du même côté."
+    ],
+    OD: eyeDef({
+      ptosis:0.25,
+      dilatorGain:0.15
+    }),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Motilité oculaire complète et symétrique, aucune restriction.",
+      pupille:"Myosis droit avec anisocorie plus marquée à l'obscurité qu'à la lumière (dilatation retardée de la pupille droite en pièce sombre — dilatation lag). Réflexe photomoteur direct et consensuel préservés des deux côtés.",
+      paupiere:"Ptosis léger de la paupière supérieure droite (perte du muscle de Müller) ; une discrète élévation de la paupière inférieure (« upside-down ptosis ») peut aussi être présente.",
+      convergence:"Convergence normale — la voie sympathique ne participe pas à la motilité extrinsèque."
+    },
+    localisation:"Voie sympathique oculaire (1er neurone hypothalamo-bulbaire, 2e neurone préganglionnaire jusqu'au ganglion cervical supérieur, ou 3e neurone postganglionnaire le long de la carotide interne).",
+    mecanisme:"L'interruption sympathique abolit le tonus du dilatateur de l'iris et du muscle de Müller, produisant la triade myosis-ptosis-anhidrose (selon le niveau lésionnel). Bascule la lampe vers la pièce sombre dans ce simulateur pour révéler l'anisocorie."
+  },
+
+  ino_od: {
+    name:"Ophtalmoplégie internucléaire (OIN) droite",
+    category:"Regard conjugué",
+    vignettes:[
+      "Femme de 29 ans, épisode de diplopie horizontale binoculaire, deuxième épisode neurologique en 18 mois.",
+      "Homme de 72 ans, hypertendu et diabétique, diplopie horizontale d'apparition brutale ce matin, sans autre déficit neurologique.",
+      "Femme de 34 ans, engourdissement d'un membre il y a 6 mois résolu spontanément, se présente maintenant pour une vision double."
+    ],
+    OD: eyeDef({
+      limits:{abduct:1, adduct:0.15, up:1, down:1}
+    }),
+    OS: eyeDef({}),
+    nystagmus:{eyes:["OS"], fastSign:1, dir:"pos", threshold:0.18, freq:3.2, amp:0.16, suppressFactor:1, alexander:false},
+    findings:{
+      motricite:"Au regard controlatéral : déficit d'adduction de l'œil droit, associé à un nystagmus horizontal de l'œil controlatéral (abducteur) — c'est le nystagmus « dissocié » caractéristique. La convergence est typiquement préservée (atteinte internucléaire, pas nucléaire).",
+      pupille:"Normale.",
+      paupiere:"Normale.",
+      convergence:"Convergence préservée malgré le déficit d'adduction au regard latéral — signe distinctif clé de l'OIN, car la voie de la convergence n'emprunte pas le FLM."
+    },
+    localisation:"Faisceau longitudinal médial (FLM) droit, dans le tronc cérébral (pont).",
+    mecanisme:"Le FLM relie le noyau du VI controlatéral au sous-noyau du droit médial du III ipsilatéral pour coordonner le regard horizontal conjugué. Sa lésion découple l'adduction de l'œil ipsilatéral de l'abduction de l'œil controlatéral. Chez le sujet jeune, évoque la sclérose en plaques ; chez le sujet âgé, une cause vasculaire."
+  },
+
+  rapd_od: {
+    name:"Pupille de Marcus Gunn (déficit pupillaire afférent relatif) droit",
+    category:"Voies pupillaires",
+    vignettes:[
+      "Femme de 31 ans, baisse de vision douloureuse à la mobilisation oculaire de l'œil droit depuis 4 jours.",
+      "Homme de 45 ans, traumatisme oculaire droit il y a une semaine, se plaint d'une vision plus sombre de cet œil.",
+      "Femme de 70 ans, baisse de vision indolore et brutale de l'œil droit ce matin, antécédent d'hypertension artérielle."
+    ],
+    OD: eyeDef({afferentGain:0.3}),
+    OS: eyeDef({}),
+    nystagmus:null,
+    findings:{
+      motricite:"Complète et symétrique.",
+      pupille:"Au test de la lampe balancée (« swinging flashlight test »), l'éclairage de l'œil droit produit une constriction pupillaire nettement plus faible que l'éclairage de l'œil controlatéral — les deux pupilles paraissent se dilater lorsque la lumière passe de l'œil sain vers l'œil atteint, alors que la voie efférente est intacte des deux côtés.",
+      paupiere:"Normale.",
+      convergence:"Convergence normale."
+    },
+    localisation:"Voie afférente visuelle droite (nerf optique le plus souvent, parfois rétine étendue).",
+    mecanisme:"Une neuropathie optique (névrite, compression, ischémie) réduit le signal afférent transmis aux noyaux prétectaux ; comme la réponse consensuelle dépend du même signal, un déficit unilatéral se démasque par le test de la lampe balancée plutôt que par l'examen statique des pupilles, qui peut rester symétrique."
+  },
+
+  vestib_periph_od: {
+    name:"Nystagmus vestibulaire périphérique droit (névrite vestibulaire)",
+    category:"Nystagmus",
+    vignettes:[
+      "Homme de 40 ans, vertige rotatoire intense d'apparition brutale ce matin, nausées, aucun symptôme auditif ni neurologique associé.",
+      "Femme de 35 ans, infection des voies respiratoires supérieures la semaine dernière, se réveille avec un vertige rotatoire sévère et des vomissements.",
+      "Homme de 50 ans, épisode de vertige constant depuis 2 jours, aggravé par les mouvements de la tête, sans céphalée ni faiblesse."
+    ],
+    OD: eyeDef({}),
+    OS: eyeDef({}),
+    nystagmus:{eyes:["OD","OS"], fastSign:1, dir:null, threshold:0, freq:2.4, amp:0.14, suppressFactor:0.12, alexander:true},
+    findings:{
+      motricite:"Nystagmus horizonto-rotatoire conjugué, à ressort : la phase lente bat vers le côté lésé et la secousse rapide de rappel — qui donne son nom au nystagmus — bat vers le côté sain. Respecte la loi d'Alexander : l'amplitude augmente au regard dans la direction de la phase rapide. Fortement atténué par la fixation visuelle.",
+      pupille:"Normale.",
+      paupiere:"Normale.",
+      convergence:"Convergence normale entre les crises."
+    },
+    localisation:"Labyrinthe ou nerf vestibulaire droit (périphérique).",
+    mecanisme:"La perte unitatérale du tonus vestibulaire crée une asymétrie de décharge entre les deux labyrinthes, interprétée par le système comme un mouvement de tête, générant un nystagmus dont la phase lente est pilotée par le réflexe vestibulo-oculaire. La suppression marquée par la fixation distingue une cause périphérique d'une cause centrale."
+  },
+
+  gaze_palsy_od: {
+    name:"Paralysie du regard conjugué horizontal droit",
+    category:"Regard conjugué",
+    vignettes:[
+      "Homme de 63 ans, hospitalisé pour un accident vasculaire cérébral du tronc, incapable de tourner les yeux vers la droite sur demande.",
+      "Femme de 58 ans, hémiparésie controlatérale d'apparition brutale, incapable de regarder vers la droite à l'examen.",
+      "Homme de 71 ans, trouble de l'élocution et incoordination d'apparition brutale, présente aussi une incapacité à regarder vers la droite."
+    ],
+    OD: eyeDef({limits:{abduct:0.08, adduct:1, up:1, down:1}}),
+    OS: eyeDef({limits:{abduct:1, adduct:0.08, up:1, down:1}}),
+    nystagmus:null,
+    findings:{
+      motricite:"Incapacité conjuguée des deux yeux à regarder vers la droite, alors que le regard controlatéral, la vergence et les mouvements verticaux restent normaux. Contrairement à une paralysie du VI isolée, aucun œil ne peut dépasser la ligne médiane vers la droite, y compris en adduction.",
+      pupille:"Normale.",
+      paupiere:"Normale.",
+      convergence:"Convergence préservée malgré l'impossibilité de regard conjugué vers la droite — la commande de convergence emprunte une voie mésencéphalique distincte de la FRPP."
+    },
+    localisation:"Centre de la latéralité du regard pontique (formation réticulée pontique paramédiane, FRPP) droite, ou son afférence corticale frontale.",
+    mecanisme:"La FRPP droite commande le regard conjugué vers la droite en activant simultanément le noyau du VI droit et, via le FLM, le sous-noyau du droit médial du III controlatéral. Sa lésion abolit tout mouvement conjugué vers ce côté, à distinguer d'une simple atteinte du VI qui n'affecte qu'un seul œil."
+  },
+
+  one_half_od: {
+    name:"Syndrome « one-and-a-half » droit",
+    category:"Regard conjugué",
+    vignettes:[
+      "Femme de 33 ans, deuxième poussée neurologique connue, diplopie sévère avec quasi-incapacité de bouger l'œil droit horizontalement.",
+      "Homme de 68 ans, AVC du tronc cérébral, incapable de tourner l'œil droit dans n'importe quelle direction horizontale, alors que l'œil controlatéral ne peut qu'abduire.",
+      "Homme de 45 ans, tumeur pontique découverte à l'imagerie, diplopie progressive avec un œil droit quasi figé horizontalement."
+    ],
+    OD: eyeDef({
+      limits:{abduct:0.08, adduct:0.1, up:1, down:1},
+      baseline:{ab:0.15, y:0}
+    }),
+    OS: eyeDef({
+      limits:{abduct:1, adduct:0.1, up:1, down:1}
+    }),
+    nystagmus:{eyes:["OS"], fastSign:1, dir:"pos", threshold:0.18, freq:3.2, amp:0.16, suppressFactor:1, alexander:false},
+    findings:{
+      motricite:"L'œil droit est quasi immobile sur le plan horizontal : il ne peut ni abduire (paralysie du regard conjugué ipsilatéral) ni adduire (OIN ipsilatérale associée), et repose souvent en légère exotropie. L'œil controlatéral conserve seulement l'abduction, avec un nystagmus de l'œil abducteur ; son adduction est elle aussi abolie au regard ipsilatéral. Au total, un seul des quatre mouvements horizontaux possibles reste préservé — l'abduction de l'œil controlatéral — d'où le nom « one-and-a-half ».",
+      pupille:"Normale.",
+      paupiere:"Normale.",
+      convergence:"Classiquement préservée, comme dans l'OIN isolée, sauf lésion plus étendue touchant aussi la voie de la convergence."
+    },
+    localisation:"Pont paramédian droit : atteinte combinée de la FRPP (ou du noyau du VI) et du FLM adjacent, du même côté.",
+    mecanisme:"La lésion associe une paralysie du regard conjugué horizontal ipsilatéral (le « un ») à une ophtalmoplégie internucléaire ipsilatérale (le « et demi ») : la FRPP/le noyau du VI abolissent tout mouvement conjugué vers le côté lésé pour les deux yeux, et le FLM ipsilatéral abolit en plus l'adduction de l'œil ipsilatéral au regard controlatéral. Il ne reste alors qu'un seul mouvement horizontal sur les quatre possibles : l'abduction de l'œil controlatéral à la lésion, souvent accompagnée d'un nystagmus. Causes typiques : sclérose en plaques chez le sujet jeune, AVC pontique chez le sujet âgé."
+  }
+};
+
+/* ---- generate mirror-image (left-sided) versions automatically ----
+   OD/OS eyeDefs are swapped directly (limits/ptosis/etc are already
+   defined relative to each eye's own abduction direction, and
+   baseline.ab is abduction-relative — both are side-independent by
+   construction, so swapping which eye holds which def is a correct
+   anatomical mirror). Text is mirrored with word-boundary swaps. */
+function mirrorText(s){
+  // protect anatomical muscle names (e.g. "droit médial" = medial RECTUS,
+  // not laterality) before swapping laterality words
+  const ANAT = ["droit médial","droit supérieur","droit inférieur","droit latéral"];
+  const tokens = [];
+  ANAT.forEach((phrase, i)=>{
+    const token = "\u0001"+i+"\u0001";
+    s = s.split(phrase).join(token);
+    tokens.push(phrase);
+  });
+  s = s
+    .replace(/\bOD\b/g, "\u0002")
+    .replace(/\bOS\b/g, "OD")
+    .replace(/\u0002/g, "OS")
+    .replace(/droite/g, "\u0003")
+    .replace(/droit\b/g, "gauche")
+    .replace(/\u0003/g, "gauche");
+  tokens.forEach((phrase, i)=>{
+    const token = "\u0001"+i+"\u0001";
+    s = s.split(token).join(phrase);
+  });
+  return s;
+}
+function mirrorPathology(src, newKey){
+  const m = {
+    name: mirrorText(src.name),
+    category: src.category,
+    vignettes: src.vignettes.map(mirrorText),
+    OD: src.OS,
+    OS: src.OD,
+    nystagmus: null,
+    findings:{
+      motricite: mirrorText(src.findings.motricite),
+      pupille: mirrorText(src.findings.pupille),
+      paupiere: mirrorText(src.findings.paupiere),
+      convergence: mirrorText(src.findings.convergence)
+    },
+    localisation: mirrorText(src.localisation),
+    mecanisme: mirrorText(src.mecanisme)
+  };
+  if(src.nystagmus){
+    m.nystagmus = Object.assign({}, src.nystagmus, {
+      eyes: src.nystagmus.eyes.map(e=> e==="OD"?"OS":"OS"===e?"OD":e),
+      fastSign: -src.nystagmus.fastSign,
+      dir: src.nystagmus.dir==="pos" ? "neg" : (src.nystagmus.dir==="neg" ? "pos" : null)
+    });
+  }
+  return m;
+}
+
+const PATHOLOGIES = Object.assign({}, PATHOLOGIES_BASE);
+["cn3_od","cn3_od_spared","cn4_od","cn6_od","horner_od","ino_od","rapd_od","vestib_periph_od","gaze_palsy_od","one_half_od"].forEach(k=>{
+  const newKey = k.replace("_od", "_os");
+  PATHOLOGIES[newKey] = mirrorPathology(PATHOLOGIES_BASE[k], newKey);
+});
+
+const CATEGORY_ORDER = ["Contrôle","Nerfs oculomoteurs","Voies pupillaires","Regard conjugué","Nystagmus"];
+const PATH_KEYS = Object.keys(PATHOLOGIES);
+
+/* ============================================================
+   SVG FACE BUILDER
+   ============================================================ */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs){
+  const e = document.createElementNS(NS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+function buildFace(svg, idPrefix){
+  svg.innerHTML = "";
+  const defs = el("defs", {});
+  ["OD","OS"].forEach(k=>{
+    const cx = k==="OD" ? 150 : 370;
+    const clip = el("clipPath", {id:idPrefix+"-clip-"+k});
+    clip.appendChild(el("ellipse", {cx:cx, cy:150, rx:82, ry:52}));
+    defs.appendChild(clip);
+  });
+  const glowGrad = el("radialGradient", {id:idPrefix+"-glow-grad"});
+  glowGrad.appendChild(el("stop", {offset:"0%", "stop-color":"#ffe9a8", "stop-opacity":"0.85"}));
+  glowGrad.appendChild(el("stop", {offset:"100%", "stop-color":"#ffe9a8", "stop-opacity":"0"}));
+  defs.appendChild(glowGrad);
+  svg.appendChild(defs);
+
+  // face base
+  svg.appendChild(el("ellipse", {cx:260, cy:165, rx:250, ry:130, fill:"#f6ecd6"}));
+  // nose bridge hint
+  const nose = el("path", {d:"M245,150 Q260,190 250,225 Q260,235 270,225 Q260,190 275,150", fill:"none", stroke:"#d8c69c", "stroke-width":3, "stroke-linecap":"round"});
+  svg.appendChild(nose);
+  // convergence near-point marker (lights up as the target approaches)
+  const noseMark = el("circle", {cx:260, cy:222, r:15, fill:"#a9824c", "fill-opacity":0, stroke:"#a9824c", "stroke-opacity":0.35, "stroke-width":2, "stroke-dasharray":"3 4"});
+  svg.appendChild(noseMark);
+
+  const eyes = {};
+  ["OD","OS"].forEach(k=>{
+    const cx = k==="OD" ? 150 : 370;
+    const cy = 150;
+    const g = el("g", {});
+
+    // eyebrow
+    const browY = cy-68;
+    g.appendChild(el("path", {d:`M${cx-70},${browY+10} Q${cx},${browY-14} ${cx+70},${browY+10}`, fill:"none", stroke:"#5b4636", "stroke-width":7, "stroke-linecap":"round"}));
+
+    // sclera
+    g.appendChild(el("ellipse", {cx:cx, cy:cy, rx:82, ry:52, fill:"#fffdf6", stroke:"#26261f", "stroke-width":3}));
+
+    // iris/pupil group (clipped, translated for gaze)
+    const irisGroup = el("g", {"clip-path":`url(#${idPrefix}-clip-${k})`});
+    const irisTranslate = el("g", {"data-role":"irisTranslate", transform:`translate(${cx},${cy})`});
+    irisTranslate.appendChild(el("circle", {r:34, fill:"#5b7a63", "data-role":"iris"}));
+    irisTranslate.appendChild(el("circle", {r:34, fill:"none", stroke:"#33452f", "stroke-width":2}));
+    irisTranslate.appendChild(el("circle", {r:16, fill:"#161511", "data-role":"pupil"}));
+    irisTranslate.appendChild(el("circle", {cx:-9, cy:-11, r:5, fill:"#fff", opacity:"0.75"}));
+    irisGroup.appendChild(irisTranslate);
+    g.appendChild(irisGroup);
+
+    // upper eyelid (skin colored, moves down for ptosis)
+    const lid = el("path", {"data-role":"lidUpper", fill:"#f6ecd6", stroke:"#26261f", "stroke-width":2.5});
+    g.appendChild(lid);
+    // lower lid (static, subtle)
+    g.appendChild(el("path", {d:`M${cx-80},${cy+34} Q${cx},${cy+58} ${cx+80},${cy+34} L${cx+90},${cy+80} L${cx-90},${cy+80} Z`, fill:"#f6ecd6"}));
+
+    // lash line under lid
+    g.appendChild(el("path", {"data-role":"lashLine", fill:"none", stroke:"#26261f", "stroke-width":2, "stroke-linecap":"round"}));
+
+    // pupillary light glow overlay (shown when this eye is illuminated)
+    const glow = el("circle", {cx:cx, cy:cy, r:100, fill:`url(#${idPrefix}-glow-grad)`, opacity:0, "pointer-events":"none"});
+    g.appendChild(glow);
+
+    svg.appendChild(g);
+    eyes[k] = {
+      cx, cy,
+      irisTranslate,
+      iris: irisTranslate.querySelector('[data-role="iris"]'),
+      pupil: irisTranslate.querySelector('[data-role="pupil"]'),
+      lid, lashLine: g.querySelector('[data-role="lashLine"]'),
+      glow
+    };
+  });
+
+  eyes._noseMark = noseMark;
+  return eyes;
+}
+
+function setLid(eyeRefs, cx, cy, ptosis){
+  // ptosis 0 (open) .. 1 (fully closed over pupil)
+  const topY = cy-52-4;
+  const lowY = cy-52 + ptosis*66; // travels down toward pupil center
+  const d = `M${cx-84},${cy} Q${cx},${lowY} ${cx+84},${cy} L${cx+92},${topY-20} L${cx-92},${topY-20} Z`;
+  eyeRefs.lid.setAttribute("d", d);
+  const lashD = `M${cx-82},${cy-1} Q${cx},${lowY+2} ${cx+82},${cy-1}`;
+  eyeRefs.lashLine.setAttribute("d", lashD);
+}
+
+/* ============================================================
+   EXAM INSTANCE (drives one stage: gaze, nystagmus, pupils)
+   ============================================================ */
+function createExamInstance(opts){
+  const stageEl = opts.stageEl;
+  const svgEl = opts.svgEl;
+  const targetDot = opts.targetDot;
+  const torchIcon = opts.torchIcon;
+  const idPrefix = opts.idPrefix;
+  const onFrame = opts.onFrame || function(){};
+
+  const eyeRefs = buildFace(svgEl, idPrefix);
+
+  const state = {
+    pathologyKey: "normal",
+    mode:"pursuit", // pursuit | lamp
+    targetX:0, targetY:0,
+    curX:0, curY:0,
+    lightOn:null, // null | "OD" | "OS"
+    ambient:"bright", // bright | dim
+    pupilSize:{OD:14, OS:14},
+    glowOpacity:{OD:0, OS:0},
+    convergeAmount:0, // smoothed 0-1
+    convergeTarget:0, // 0-1, set continuously from proximity to the nose tip
+    running:true
+  };
+
+  function pathology(){ return PATHOLOGIES[state.pathologyKey]; }
+
+  function setPathology(key){
+    state.pathologyKey = key;
+    state.lightOn = null;
+  }
+
+  function setMode(mode){
+    state.mode = mode;
+    state.lightOn = null;
+    state.convergeTarget = 0;
+    if(mode !== "pursuit"){ state.targetX = 0; state.targetY = 0; }
+    targetDot.classList.toggle("hidden", mode!=="pursuit");
+    if(torchIcon) torchIcon.classList.toggle("show", mode==="lamp");
+    if(mode !== "lamp"){
+      targetDot.style.left = "50%";
+      targetDot.style.top = "38%";
+      if(torchIcon){ torchIcon.style.left = "50%"; torchIcon.style.top = "38%"; }
+    }
+  }
+
+  // ---- pointer tracking ----
+  // svg viewBox is 520x400; eyes sit at (150,150) and (370,150);
+  // the nose tip (convergence near-point) sits at (260,225).
+  // NOSE_ZERO_R is kept tight and mostly vertical-distance-driven so an
+  // ordinary lateral sweep at eye level (~75px above the tip) never
+  // enters the zone — convergence only builds as the cursor genuinely
+  // travels down toward the nose.
+  const EYE_HIT_R = 92, NOSE_X = 260, NOSE_Y = 225, NOSE_FULL_R = 16, NOSE_ZERO_R = 68;
+
+  function updateFromEvent(clientX, clientY){
+    const r = stageEl.getBoundingClientRect();
+    let nx = ((clientX - r.left)/r.width)*2 - 1;
+    let ny = ((clientY - r.top)/r.height)*2 - 1;
+    nx = Math.max(-1, Math.min(1, nx));
+    ny = Math.max(-1, Math.min(1, ny));
+
+    const svgX = ((clientX - r.left)/r.width)*520;
+    const svgY = ((clientY - r.top)/r.height)*400;
+
+    if(state.mode === "pursuit"){
+      state.targetX = nx;
+      state.targetY = ny*0.7;
+      // the closer the cursor gets to the nose tip, the more the eyes
+      // converge — smooth and continuous, reaching maximum right at the tip
+      const dNose = Math.hypot(svgX-NOSE_X, svgY-NOSE_Y);
+      state.convergeTarget = Math.max(0, Math.min(1, (NOSE_ZERO_R-dNose)/(NOSE_ZERO_R-NOSE_FULL_R)));
+    }
+
+    const leftPct = ((nx*0.5+0.5)*100)+"%";
+    const topPct = ((ny*0.7*0.5+0.5)*100)+"%";
+    targetDot.style.left = leftPct;
+    targetDot.style.top = topPct;
+    if(torchIcon){ torchIcon.style.left = leftPct; torchIcon.style.top = topPct; }
+
+    if(state.mode === "lamp"){
+      // the torch only illuminates an eye once it's actually held close
+      // to it — move it away from both eyes to turn the light off, and
+      // swing it between the two to reproduce the swinging flashlight test
+      const dOD = Math.hypot(svgX-150, svgY-150);
+      const dOS = Math.hypot(svgX-370, svgY-150);
+      if(dOD < EYE_HIT_R && dOD <= dOS) state.lightOn = "OD";
+      else if(dOS < EYE_HIT_R) state.lightOn = "OS";
+      else state.lightOn = null;
+    }
+  }
+  stageEl.addEventListener("pointermove", (e)=> updateFromEvent(e.clientX, e.clientY));
+  stageEl.addEventListener("pointerdown", (e)=> updateFromEvent(e.clientX, e.clientY));
+  function resetToCenter(){
+    if(state.mode === "pursuit"){ state.targetX = 0; state.targetY = 0; state.convergeTarget = 0; }
+    if(state.mode === "lamp"){ state.lightOn = null; }
+    targetDot.style.left = "50%";
+    targetDot.style.top = "38%";
+    if(torchIcon){ torchIcon.style.left = "50%"; torchIcon.style.top = "38%"; }
+  }
+  stageEl.addEventListener("pointerleave", resetToCenter);
+  // on touch devices there's no hover to "leave" — lifting the finger is
+  // the equivalent signal that the exam gesture has ended
+  stageEl.addEventListener("pointerup", (e)=>{ if(e.pointerType === "touch") resetToCenter(); });
+  stageEl.addEventListener("pointercancel", resetToCenter);
+
+  // ---- constrain gaze per eye ----
+  function constrain(nx, ny, key, def){
+    const abductSign = key==="OD" ? -1 : 1;
+    let ex, ey;
+    const magX = nx*abductSign;
+    if(magX >= 0){
+      const m = def.limits.abduct;
+      ex = Math.abs(nx) > m ? abductSign*m : nx;
+    } else {
+      const m = def.limits.adduct;
+      ex = Math.abs(nx) > m ? -abductSign*m : nx;
+    }
+    if(ny < 0){
+      const m = def.limits.up;
+      ey = Math.abs(ny) > m ? -m : ny;
+    } else {
+      const m = def.limits.down;
+      ey = Math.abs(ny) > m ? m : ny;
+    }
+    ex += def.baseline.ab*abductSign;
+    ey += def.baseline.y;
+    ex = Math.max(-1, Math.min(1, ex));
+    ey = Math.max(-1, Math.min(1, ey));
+    return {ex, ey};
+  }
+
+  function sawtooth(p, fastSign){
+    const slowFrac = 0.8;
+    if(p < slowFrac){
+      const q = p/slowFrac;
+      return fastSign*(1 - q*2);
+    } else {
+      const q = (p-slowFrac)/(1-slowFrac);
+      return fastSign*(-1 + q*2);
+    }
+  }
+
+  // ---- pupil light model ----
+  const REST_BRIGHT = 13, REST_DIM = 21, MIN_LIGHT = 7;
+  function restingSize(def){
+    if(state.ambient === "bright") return REST_BRIGHT;
+    return REST_BRIGHT + (REST_DIM-REST_BRIGHT)*def.dilatorGain;
+  }
+  function targetPupilSize(key, def){
+    if(def.fixedSize) return def.fixedSize;
+    const rest = restingSize(def);
+    if(!state.lightOn) return rest;
+    const litDef = pathology()[state.lightOn];
+    const signal = litDef.afferentGain;
+    if(!def.efferentOK) return def.fixedSize || rest;
+    return rest - (rest-MIN_LIGHT)*signal;
+  }
+
+  let lastT = performance.now();
+  function frame(now){
+    if(!state.running) return;
+    lastT = now;
+
+    state.curX += (state.targetX - state.curX)*0.22;
+    state.curY += (state.targetY - state.curY)*0.22;
+
+    state.convergeAmount += (state.convergeTarget - state.convergeAmount)*0.06;
+    const conv = state.convergeAmount;
+    if(eyeRefs._noseMark) eyeRefs._noseMark.setAttribute("fill-opacity", conv*0.55);
+
+    const p = pathology();
+    ["OD","OS"].forEach(key=>{
+      const def = p[key];
+      const refs = eyeRefs[key];
+
+      const c = constrain(state.curX, state.curY, key, def);
+      let ex = c.ex, ey = c.ey;
+
+      let nyTriggered = false;
+      if(p.nystagmus && p.nystagmus.eyes.includes(key)){
+        const dir = p.nystagmus.dir;
+        if(!dir) nyTriggered = true;
+        else if(dir==="pos") nyTriggered = state.curX > p.nystagmus.threshold;
+        else if(dir==="neg") nyTriggered = state.curX < -p.nystagmus.threshold;
+      }
+      if(nyTriggered){
+        const ny = p.nystagmus;
+        let amp = ny.amp*(1-conv); // near effort dampens nystagmus, as in real life
+        if(ny.suppressFactor !== undefined) amp *= ny.suppressFactor;
+        if(ny.alexander) amp *= (1 + Math.max(0, state.curX*ny.fastSign)*0.9);
+        const periodMs = 1000/ny.freq;
+        const phase = ((now % periodMs)/periodMs);
+        const v = sawtooth(phase, ny.fastSign);
+        ex += v*amp;
+      }
+
+      if(conv > 0){
+        // convergence is disconjugate (both eyes adduct toward the nose) —
+        // blend smoothly into the conjugate pursuit position as the
+        // fixation target approaches the nose tip
+        const abductSign = key==="OD" ? -1 : 1;
+        const amount = def.convergenceOK ? 0.85 : def.limits.adduct*0.85;
+        const convEx = -abductSign*amount;
+        const convEy = 0.25; // near triad: slight downgaze with convergence
+        ex = ex*(1-conv) + convEx*conv;
+        ey = ey*(1-conv) + convEy*conv;
+      }
+
+      const rangeX = 62, rangeY = 34;
+      refs.irisTranslate.setAttribute("transform", `translate(${refs.cx + ex*rangeX},${refs.cy + ey*rangeY})`);
+
+      setLid(refs, refs.cx, refs.cy, def.ptosis);
+
+      const targetSize = targetPupilSize(key, def);
+      state.pupilSize[key] += (targetSize - state.pupilSize[key])*0.07;
+      refs.pupil.setAttribute("r", Math.max(3, state.pupilSize[key]));
+
+      const glowTarget = (state.mode==="lamp" && state.lightOn===key) ? 0.55 : 0;
+      state.glowOpacity[key] += (glowTarget - state.glowOpacity[key])*0.15;
+      refs.glow.setAttribute("opacity", Math.max(0, state.glowOpacity[key]));
+    });
+
+    onFrame(state);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  return {
+    state,
+    setPathology,
+    setMode,
+    setAmbient(v){ state.ambient = v; }
+  };
+}
+
+/* ============================================================
+   EXTERNAL SEARCH (Google, opens in a new tab — no API key needed)
+   ============================================================ */
+const searchInput = document.getElementById("search-input");
+document.getElementById("search-form").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const q = searchInput.value.trim();
+  if(!q) return;
+  window.open("https://www.google.com/search?q="+encodeURIComponent(q), "_blank", "noopener");
+});
+function setSearchQuery(name){
+  searchInput.value = name;
+}
+
+/* ============================================================
+   WIRING — APPRENDRE TAB
+   ============================================================ */
+const examA = createExamInstance({
+  stageEl: document.getElementById("stage-a"),
+  svgEl: document.getElementById("svg-a"),
+  targetDot: document.getElementById("target-a"),
+  torchIcon: document.getElementById("torch-a"),
+  idPrefix:"a"
+});
+
+function renderInfo(container, key){
+  const p = PATHOLOGIES[key];
+  container.innerHTML = `
+    <span class="cat">${p.category}</span>
+    <h2>${p.name}</h2>
+    <div class="info-block"><h3>motricité oculaire</h3><p>${p.findings.motricite}</p></div>
+    <div class="info-block"><h3>convergence</h3><p>${p.findings.convergence}</p></div>
+    <div class="info-block"><h3>pupille</h3><p>${p.findings.pupille}</p></div>
+    <div class="info-block"><h3>paupière</h3><p>${p.findings.paupiere}</p></div>
+    <div class="info-block"><h3>localisation</h3><p>${p.localisation}</p></div>
+    <div class="info-block"><h3>mécanisme</h3><p>${p.mecanisme}</p></div>
+  `;
+}
+
+function buildPathList(){
+  const wrap = document.getElementById("path-list");
+  wrap.innerHTML = "";
+  CATEGORY_ORDER.forEach(cat=>{
+    const keys = PATH_KEYS.filter(k=>PATHOLOGIES[k].category===cat);
+    if(!keys.length) return;
+    const label = document.createElement("div");
+    label.className = "path-group-label";
+    label.textContent = cat;
+    wrap.appendChild(label);
+    keys.forEach(k=>{
+      const btn = document.createElement("button");
+      btn.className = "path-btn" + (k==="normal" ? " active" : "");
+      btn.textContent = PATHOLOGIES[k].name;
+      btn.dataset.key = k;
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".path-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        examA.setPathology(k);
+        renderInfo(document.getElementById("info-a"), k);
+        setSearchQuery(PATHOLOGIES[k].name);
+        syncControlButtons("a", examA);
+      });
+      wrap.appendChild(btn);
+    });
+  });
+}
+buildPathList();
+renderInfo(document.getElementById("info-a"), "normal");
+setSearchQuery(PATHOLOGIES.normal.name);
+
+function syncControlButtons(suffix, exam){
+  [["pursuit","mode-pursuit"],["lamp","mode-lamp"]].forEach(([mode,idBase])=>{
+    const btn = document.getElementById(`${idBase}-${suffix}`);
+    if(!btn) return;
+    btn.classList.toggle("on", exam.state.mode===mode);
+  });
+  ["bright","dim"].forEach(v=>{
+    const btn = document.getElementById(`amb-${v}-${suffix}`);
+    if(!btn) return;
+    btn.classList.toggle("on", exam.state.ambient===v);
+  });
+}
+
+const MODE_HINTS = {
+  pursuit:"bouge le curseur pour la poursuite oculaire — amène-le près du bout du nez pour tester la convergence",
+  lamp:"tiens la lampe tout près d'un œil pour l'éclairer, puis balance-la vers l'autre (test de la lampe balancée)"
+};
+
+function wireControls(suffix, exam){
+  [["pursuit","mode-pursuit"],["lamp","mode-lamp"]].forEach(([mode,idBase])=>{
+    const btn = document.getElementById(`${idBase}-${suffix}`);
+    if(!btn) return;
+    btn.addEventListener("click", ()=>{
+      exam.setMode(mode);
+      syncControlButtons(suffix, exam);
+      const hint = document.getElementById(`hint-${suffix}`);
+      if(hint) hint.textContent = MODE_HINTS[mode];
+    });
+  });
+  ["bright","dim"].forEach(v=>{
+    const btn = document.getElementById(`amb-${v}-${suffix}`);
+    if(!btn) return;
+    btn.addEventListener("click", ()=>{
+      exam.setAmbient(v);
+      syncControlButtons(suffix, exam);
+    });
+  });
+}
+wireControls("a", examA);
+syncControlButtons("a", examA);
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("view-"+btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* ============================================================
+   WIRING — QUIZ TAB
+   ============================================================ */
+const examQ = createExamInstance({
+  stageEl: document.getElementById("stage-q"),
+  svgEl: document.getElementById("svg-q"),
+  targetDot: document.getElementById("target-q"),
+  torchIcon: document.getElementById("torch-q"),
+  idPrefix:"q"
+});
+wireControls("q", examQ);
+
+let quizScore = 0, quizTotal = 0, quizAnswered = false, currentKey = null, lastKey = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function newQuizQuestion(){
+  quizAnswered = false;
+  let key;
+  do { key = PATH_KEYS[Math.floor(Math.random()*PATH_KEYS.length)]; } while(key===lastKey && PATH_KEYS.length>1);
+  lastKey = key;
+  currentKey = key;
+  examQ.setPathology(key);
+  examQ.setMode("pursuit");
+  syncControlButtons("q", examQ);
+  document.getElementById("hint-q").textContent = MODE_HINTS.pursuit;
+  setSearchQuery("");
+
+  document.getElementById("quiz-vignette").textContent = shuffle(PATHOLOGIES[key].vignettes)[0];
+
+  document.getElementById("info-q").innerHTML = `
+    <h2>Ton diagnostic ?</h2>
+    <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;line-height:1.6;color:var(--cream);">Explore le regard et la pupille du patient avec la souris, puis sélectionne une réponse dans la liste ci-dessous. L'explication clinique apparaîtra ici une fois ta réponse soumise.</p>
+  `;
+
+  const distractorPool = PATH_KEYS.filter(k=>k!==key);
+  const distractors = shuffle(distractorPool).slice(0,3);
+  const options = shuffle([key, ...distractors]);
+
+  const optWrap = document.getElementById("quiz-options");
+  optWrap.innerHTML = "";
+  options.forEach(k=>{
+    const b = document.createElement("button");
+    b.className = "opt-btn";
+    b.textContent = PATHOLOGIES[k].name;
+    b.addEventListener("click", ()=> submitAnswer(k, b));
+    optWrap.appendChild(b);
+  });
+
+  document.getElementById("quiz-feedback").className = "feedback-banner";
+  document.getElementById("quiz-feedback").textContent = "";
+  document.getElementById("quiz-next").style.display = "none";
+}
+
+function submitAnswer(chosenKey, btnEl){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  quizTotal++;
+  const correct = chosenKey === currentKey;
+  if(correct) quizScore++;
+  document.getElementById("score-chip").textContent = `score : ${quizScore} / ${quizTotal}`;
+
+  document.querySelectorAll("#quiz-options .opt-btn").forEach(b=>{
+    b.disabled = true;
+    if(b.textContent === PATHOLOGIES[currentKey].name) b.classList.add("correct");
+    else if(b===btnEl && !correct) b.classList.add("wrong");
+  });
+
+  const fb = document.getElementById("quiz-feedback");
+  fb.className = "feedback-banner " + (correct ? "correct" : "wrong");
+  fb.textContent = correct ? "Bonne réponse." : `Réponse attendue : ${PATHOLOGIES[currentKey].name}`;
+
+  renderInfo(document.getElementById("info-q"), currentKey);
+  setSearchQuery(PATHOLOGIES[currentKey].name);
+  document.getElementById("quiz-next").style.display = "inline-block";
+}
+
+document.getElementById("quiz-next").addEventListener("click", newQuizQuestion);
+newQuizQuestion();
+
+})();
+</script>
+</body>
+</html>

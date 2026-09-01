@@ -76,6 +76,35 @@ header.site-head{
   min-width:170px;
 }
 
+.head-title-row{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:50px;height:50px;flex:0 0 auto;}
+.logo-bolt{
+  transform-origin:38px 24px;
+  animation:boltPulse 3.2s ease-in-out infinite;
+}
+@keyframes boltPulse{
+  0%,100%{opacity:0.75;filter:drop-shadow(0 0 0 rgba(201,147,47,0));}
+  50%{opacity:1;filter:drop-shadow(0 0 5px rgba(201,147,47,0.85));}
+}
+@media (max-width:640px){
+  .logo-icon{width:40px;height:40px;}
+}
+
+/* ---------- animations ---------- */
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.view.active{animation:fadeInUp .35s ease;}
+.anim-refresh{animation:fadeInUp .3s ease;}
+@keyframes scoreBump{
+  0%{transform:scale(1);}
+  35%{transform:scale(1.18);}
+  100%{transform:scale(1);}
+}
+.score-chip.bump{animation:scoreBump .4s ease;}
+.feedback-banner.correct,.feedback-banner.wrong{animation:fadeInUp .3s ease;}
+
 /* ---------- tabs ---------- */
 .tabs{
   display:flex;
@@ -113,48 +142,62 @@ header.site-head{
   gap:22px;
   align-items:start;
 }
+.quiz-grid{grid-template-columns:1fr 300px;}
 @media (max-width:980px){
-  .exam-grid{grid-template-columns:1fr;}
+  .exam-grid, .quiz-grid{grid-template-columns:1fr;}
+  .stage-card{order:0;}
+  .info-panel{order:1;}
   .path-list-col{order:2;}
-  .stage-card{order:1;}
-  .info-panel{order:3;}
   .path-list{
     display:flex;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    gap:8px;
-    padding-bottom:6px;
-    -webkit-overflow-scrolling:touch;
+    flex-direction:column;
+    gap:14px;
   }
-  .path-group-label{display:none;}
+  .path-group-label{display:block;text-align:center;}
   .path-btn{
-    flex:0 0 auto;
-    max-width:180px;
+    width:100%;
+    max-width:none;
     white-space:normal;
-    margin-bottom:0;
+    margin-bottom:6px;
   }
 }
 @media (max-width:640px){
-  .page{padding:20px 14px 56px;}
-  .site-head{flex-direction:column;align-items:flex-start;gap:4px;}
-  .byline{text-align:left;min-width:0;}
-  .tabs{width:100%;}
+  .page{padding:18px 12px 48px;}
+  .site-head{flex-direction:column;align-items:center;text-align:center;gap:6px;border-bottom-width:2px;}
+  .byline{text-align:center;min-width:0;}
+  .tabs{width:100%;border-width:2px;margin:0 auto 22px;}
   .tab-btn{flex:1;padding:12px 10px;font-size:15px;}
-  .stage-controls{gap:8px;}
-  .ctl-group{width:100%;}
+  .stage-card{
+    padding:14px 12px 12px;
+    border-width:2px;
+    box-shadow:0 2px 0 rgba(28,22,15,0.18);
+    background-image:none;
+  }
+  .stage-wrap{border-width:2px;}
+  .stage-controls{gap:8px;justify-content:center;}
+  .ctl-group{width:100%;justify-content:center;}
   .ctl-btn{
     padding:11px 13px;
     font-size:12.5px;
     flex:1;
     min-width:0;
     min-height:44px;
+    border-width:1.5px;
+    box-shadow:0 1.5px 0 var(--ink);
   }
-  .ctl-label{width:100%;margin-right:0;margin-bottom:2px;}
-  .quiz-top{flex-direction:column;align-items:flex-start;}
-  .score-chip{align-self:flex-start;}
-  .opt-btn{min-height:46px;padding:12px 14px;}
-  .path-btn{min-height:40px;display:flex;align-items:center;}
+  .ctl-btn.on{box-shadow:0 1px 0 var(--forest-deep);}
+  .ctl-label{width:100%;margin-right:0;margin-bottom:2px;text-align:center;}
+  .quiz-top{flex-direction:column;align-items:center;text-align:center;}
+  .score-chip{align-self:center;}
+  .quiz-instructions{text-align:center;max-width:none;}
+  .opt-btn{min-height:46px;padding:12px 14px;border-width:1.5px;box-shadow:0 1.5px 0 rgba(28,22,15,0.1);}
+  .path-btn{min-height:48px;display:flex;align-items:center;border-width:1.5px;box-shadow:0 1.5px 0 rgba(28,22,15,0.1);}
   .next-btn{width:100%;min-height:46px;}
+  .info-panel{border-width:1.5px;padding:16px 16px 18px;}
+}
+@media (max-width:400px){
+  .site-head h1{font-size:23px;}
+  .stage-card{padding:10px 8px 10px;}
 }
 
 /* ---------- pathology list (Apprendre) ---------- */
@@ -443,8 +486,9 @@ header.site-head{
 .search-bar input[type="text"]::placeholder{color:var(--ink-soft);opacity:0.7;}
 .search-bar .ctl-btn{white-space:nowrap;}
 @media (max-width:640px){
-  .search-bar{flex-direction:column;align-items:stretch;margin-top:36px;}
+  .search-bar{flex-direction:column;align-items:stretch;margin-top:28px;padding:14px 14px;border-width:1.5px;box-shadow:0 2px 0 rgba(28,22,15,0.15);}
   .search-bar #search-form{flex-direction:column;}
+  .search-bar input[type="text"]{border-width:1.5px;}
 }
 
 footer.site-foot{
@@ -461,9 +505,20 @@ footer.site-foot{
 <div class="page">
 
   <header class="site-head">
-    <div>
-      <h1>Examen neuro-ophtalmologique</h1>
-      <div class="sub">simulateur interactif — motricité oculaire · pupilles · nystagmus</div>
+    <div class="head-title-row">
+      <svg class="logo-icon" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M5,30 Q30,9 55,30 Q30,51 5,30 Z" fill="var(--white)" stroke="var(--ink)" stroke-width="2.5"/>
+        <circle cx="27" cy="30" r="10" fill="var(--forest)" stroke="var(--ink)" stroke-width="1.5"/>
+        <circle cx="27" cy="30" r="4.2" fill="var(--ink)"/>
+        <circle cx="24" cy="27" r="1.8" fill="var(--white)" opacity="0.8"/>
+        <g class="logo-bolt">
+          <path d="M40,6 L32,23 L38,23 L29,42 L47,20 L39,20 Z" fill="var(--gold)" stroke="var(--forest-deep)" stroke-width="1.2"/>
+        </g>
+      </svg>
+      <div>
+        <h1>Examen neuro-ophtalmologique</h1>
+        <div class="sub">simulateur interactif : motricité oculaire · pupilles · nystagmus</div>
+      </div>
     </div>
     <div class="byline">déplace le curseur (souris<br>ou doigt) dans la zone<br>pour fixer le regard du patient</div>
   </header>
@@ -497,15 +552,15 @@ footer.site-foot{
             </svg>
           </div>
         </div>
-        <p class="stage-hint" id="hint-a">bouge le curseur pour la poursuite oculaire — amène-le près du bout du nez pour tester la convergence</p>
+        <p class="stage-hint" id="hint-a">bouge le curseur pour la poursuite oculaire, amène-le près du bout du nez pour tester la convergence</p>
         <div class="stage-controls">
           <div class="ctl-group">
-            <span class="ctl-label">mode d'examen —</span>
+            <span class="ctl-label">mode d'examen :</span>
             <button class="ctl-btn on" data-mode="pursuit" id="mode-pursuit-a">poursuite oculaire</button>
             <button class="ctl-btn" data-mode="lamp" id="mode-lamp-a">réflexe pupillaire (lampe)</button>
           </div>
           <div class="ctl-group">
-            <span class="ctl-label">ambiance —</span>
+            <span class="ctl-label">ambiance :</span>
             <button class="ctl-btn on" data-ambient="bright" id="amb-bright-a">pièce éclairée</button>
             <button class="ctl-btn" data-ambient="dim" id="amb-dim-a">pièce sombre</button>
           </div>
@@ -523,7 +578,7 @@ footer.site-foot{
       <div class="score-chip" id="score-chip">score : 0 / 0</div>
     </div>
 
-    <div class="exam-grid" style="grid-template-columns:1fr 300px;">
+    <div class="exam-grid quiz-grid">
       <div class="stage-card">
         <div class="stage-wrap" id="stage-q">
           <svg class="face-svg" id="svg-q" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -541,15 +596,15 @@ footer.site-foot{
             </svg>
           </div>
         </div>
-        <p class="stage-hint" id="hint-q">bouge le curseur pour la poursuite oculaire — amène-le près du bout du nez pour tester la convergence</p>
+        <p class="stage-hint" id="hint-q">bouge le curseur pour la poursuite oculaire, amène-le près du bout du nez pour tester la convergence</p>
         <div class="stage-controls">
           <div class="ctl-group">
-            <span class="ctl-label">mode d'examen —</span>
+            <span class="ctl-label">mode d'examen :</span>
             <button class="ctl-btn on" data-mode="pursuit" id="mode-pursuit-q">poursuite oculaire</button>
             <button class="ctl-btn" data-mode="lamp" id="mode-lamp-q">réflexe pupillaire (lampe)</button>
           </div>
           <div class="ctl-group">
-            <span class="ctl-label">ambiance —</span>
+            <span class="ctl-label">ambiance :</span>
             <button class="ctl-btn on" data-ambient="bright" id="amb-bright-q">pièce éclairée</button>
             <button class="ctl-btn" data-ambient="dim" id="amb-dim-q">pièce sombre</button>
           </div>
@@ -568,14 +623,14 @@ footer.site-foot{
   </section>
 
   <div class="search-bar">
-    <span class="ctl-label">en savoir plus —</span>
+    <span class="ctl-label">en savoir plus :</span>
     <form id="search-form">
       <input type="text" id="search-input" placeholder="rechercher sur Google (ex. paralysie du III nerf oculomoteur)" autocomplete="off">
       <button type="submit" class="ctl-btn">Rechercher</button>
     </form>
   </div>
 
-  <footer class="site-foot">simulateur pédagogique — les paramètres de motricité et de réflexe pupillaire sont simplifiés à des fins d'enseignement et ne remplacent pas un examen clinique réel. La recherche ouvre Google dans un nouvel onglet.</footer>
+  <footer class="site-foot">Simulateur pédagogique : les paramètres de motricité et de réflexe pupillaire sont simplifiés à des fins d'enseignement et ne remplacent pas un examen clinique réel. La recherche ouvre Google dans un nouvel onglet.</footer>
 </div>
 
 <script>
@@ -627,7 +682,7 @@ const PATHOLOGIES_BASE = {
       paupiere:"Fentes palpébrales symétriques, sans ptosis.",
       convergence:"Convergence normale, myosis et rapprochement symétrique des deux globes en vision de près."
     },
-    localisation:"—",
+    localisation:"Sans objet (examen normal)",
     mecanisme:"Sert de référence pour comparer les autres tracés."
   },
 
@@ -653,10 +708,10 @@ const PATHOLOGIES_BASE = {
       motricite:"Œil droit dévié en abduction et légèrement en dépression au repos (« down and out »). Adduction, élévation et dépression très limitées ; l'abduction (CN VI) est préservée. La convergence est également abolie (le droit médial est directement atteint, contrairement à l'OIN).",
       pupille:"Mydriase droite fixe, aréactive à la lumière directe et consensuelle (efférence parasympathique interrompue). La pupille controlatérale reste normo-réactive.",
       paupiere:"Ptosis complet à droite, couvrant l'axe visuel.",
-      convergence:"Convergence abolie du côté droit — le droit médial est directement paralysé, contrairement à l'OIN où la convergence est épargnée."
+      convergence:"Convergence abolie du côté droit : le droit médial est directement paralysé, contrairement à l'OIN où la convergence est épargnée."
     },
     localisation:"Nerf crânien III (fascicule, trajet sous-arachnoïdien ou sinus caverneux).",
-    mecanisme:"Atteinte du III entraîne une paralysie des muscles droit médial, droit supérieur, droit inférieur, oblique inférieur, releveur de la paupière, et des fibres parasympathiques péri­phériques du sphincter irien. L'atteinte pupillaire associée oriente vers une cause compressive (ex. anévrisme de la communicante postérieure) — une urgence diagnostique devant tout III douloureux avec mydriase."
+    mecanisme:"Atteinte du III entraîne une paralysie des muscles droit médial, droit supérieur, droit inférieur, oblique inférieur, releveur de la paupière, et des fibres parasympathiques péri­phériques du sphincter irien. L'atteinte pupillaire associée oriente vers une cause compressive (ex. anévrisme de la communicante postérieure), une urgence diagnostique devant tout III douloureux avec mydriase."
   },
 
   cn3_od_spared: {
@@ -676,8 +731,8 @@ const PATHOLOGIES_BASE = {
     OS: eyeDef({}),
     nystagmus:null,
     findings:{
-      motricite:"Limitation marquée de l'adduction, de l'élévation et de la dépression de l'œil droit, abduction relativement préservée — même distribution qu'une paralysie complète du III. La convergence est aussi limitée.",
-      pupille:"Pupilles isocoriques et normo-réactives des deux côtés — le sphincter irien est épargné.",
+      motricite:"Limitation marquée de l'adduction, de l'élévation et de la dépression de l'œil droit, abduction relativement préservée, une distribution identique à celle d'une paralysie complète du III. La convergence est aussi limitée.",
+      pupille:"Pupilles isocoriques et normo-réactives des deux côtés : le sphincter irien est épargné.",
       paupiere:"Ptosis partiel à droite.",
       convergence:"Convergence limitée du côté droit, dans la même mesure que l'adduction."
     },
@@ -729,7 +784,7 @@ const PATHOLOGIES_BASE = {
       motricite:"Abduction de l'œil droit très limitée ; ésotropie (déviation en dedans) en position primaire, maximale au regard vers la droite. Diplopie horizontale binoculaire s'aggravant au regard vers le côté atteint.",
       pupille:"Normale.",
       paupiere:"Normale.",
-      convergence:"Convergence normale — seul le droit latéral est atteint, le droit médial est intact."
+      convergence:"Convergence normale : seul le droit latéral est atteint, le droit médial est intact."
     },
     localisation:"Nerf crânien VI, innervant le muscle droit latéral droit.",
     mecanisme:"Le VI a le plus long trajet intracrânien des nerfs oculomoteurs, ce qui le rend vulnérable à l'hypertension intracrânienne (signe de fausse localisation) autant qu'aux causes microvasculaires, traumatiques ou compressives directes."
@@ -751,9 +806,9 @@ const PATHOLOGIES_BASE = {
     nystagmus:null,
     findings:{
       motricite:"Motilité oculaire complète et symétrique, aucune restriction.",
-      pupille:"Myosis droit avec anisocorie plus marquée à l'obscurité qu'à la lumière (dilatation retardée de la pupille droite en pièce sombre — dilatation lag). Réflexe photomoteur direct et consensuel préservés des deux côtés.",
+      pupille:"Myosis droit avec anisocorie plus marquée à l'obscurité qu'à la lumière (dilatation retardée de la pupille droite en pièce sombre, phénomène dit de dilatation lag). Réflexe photomoteur direct et consensuel préservés des deux côtés.",
       paupiere:"Ptosis léger de la paupière supérieure droite (perte du muscle de Müller) ; une discrète élévation de la paupière inférieure (« upside-down ptosis ») peut aussi être présente.",
-      convergence:"Convergence normale — la voie sympathique ne participe pas à la motilité extrinsèque."
+      convergence:"Convergence normale : la voie sympathique ne participe pas à la motilité extrinsèque."
     },
     localisation:"Voie sympathique oculaire (1er neurone hypothalamo-bulbaire, 2e neurone préganglionnaire jusqu'au ganglion cervical supérieur, ou 3e neurone postganglionnaire le long de la carotide interne).",
     mecanisme:"L'interruption sympathique abolit le tonus du dilatateur de l'iris et du muscle de Müller, produisant la triade myosis-ptosis-anhidrose (selon le niveau lésionnel). Bascule la lampe vers la pièce sombre dans ce simulateur pour révéler l'anisocorie."
@@ -773,10 +828,10 @@ const PATHOLOGIES_BASE = {
     OS: eyeDef({}),
     nystagmus:{eyes:["OS"], fastSign:1, dir:"pos", threshold:0.18, freq:3.2, amp:0.16, suppressFactor:1, alexander:false},
     findings:{
-      motricite:"Au regard controlatéral : déficit d'adduction de l'œil droit, associé à un nystagmus horizontal de l'œil controlatéral (abducteur) — c'est le nystagmus « dissocié » caractéristique. La convergence est typiquement préservée (atteinte internucléaire, pas nucléaire).",
+      motricite:"Au regard controlatéral : déficit d'adduction de l'œil droit, associé à un nystagmus horizontal de l'œil controlatéral (abducteur) : c'est le nystagmus « dissocié » caractéristique. La convergence est typiquement préservée (atteinte internucléaire, pas nucléaire).",
       pupille:"Normale.",
       paupiere:"Normale.",
-      convergence:"Convergence préservée malgré le déficit d'adduction au regard latéral — signe distinctif clé de l'OIN, car la voie de la convergence n'emprunte pas le FLM."
+      convergence:"Convergence préservée malgré le déficit d'adduction au regard latéral : signe distinctif clé de l'OIN, car la voie de la convergence n'emprunte pas le FLM."
     },
     localisation:"Faisceau longitudinal médial (FLM) droit, dans le tronc cérébral (pont).",
     mecanisme:"Le FLM relie le noyau du VI controlatéral au sous-noyau du droit médial du III ipsilatéral pour coordonner le regard horizontal conjugué. Sa lésion découple l'adduction de l'œil ipsilatéral de l'abduction de l'œil controlatéral. Chez le sujet jeune, évoque la sclérose en plaques ; chez le sujet âgé, une cause vasculaire."
@@ -795,7 +850,7 @@ const PATHOLOGIES_BASE = {
     nystagmus:null,
     findings:{
       motricite:"Complète et symétrique.",
-      pupille:"Au test de la lampe balancée (« swinging flashlight test »), l'éclairage de l'œil droit produit une constriction pupillaire nettement plus faible que l'éclairage de l'œil controlatéral — les deux pupilles paraissent se dilater lorsque la lumière passe de l'œil sain vers l'œil atteint, alors que la voie efférente est intacte des deux côtés.",
+      pupille:"Au test de la lampe balancée (« swinging flashlight test »), l'éclairage de l'œil droit produit une constriction pupillaire nettement plus faible que l'éclairage de l'œil controlatéral : les deux pupilles paraissent se dilater lorsque la lumière passe de l'œil sain vers l'œil atteint, alors que la voie efférente est intacte des deux côtés.",
       paupiere:"Normale.",
       convergence:"Convergence normale."
     },
@@ -815,7 +870,7 @@ const PATHOLOGIES_BASE = {
     OS: eyeDef({}),
     nystagmus:{eyes:["OD","OS"], fastSign:1, dir:null, threshold:0, freq:2.4, amp:0.14, suppressFactor:0.12, alexander:true},
     findings:{
-      motricite:"Nystagmus horizonto-rotatoire conjugué, à ressort : la phase lente bat vers le côté lésé et la secousse rapide de rappel — qui donne son nom au nystagmus — bat vers le côté sain. Respecte la loi d'Alexander : l'amplitude augmente au regard dans la direction de la phase rapide. Fortement atténué par la fixation visuelle.",
+      motricite:"Nystagmus horizonto-rotatoire conjugué, à ressort : la phase lente bat vers le côté lésé et la secousse rapide de rappel, qui donne son nom au nystagmus, bat vers le côté sain. Respecte la loi d'Alexander : l'amplitude augmente au regard dans la direction de la phase rapide. Fortement atténué par la fixation visuelle.",
       pupille:"Normale.",
       paupiere:"Normale.",
       convergence:"Convergence normale entre les crises."
@@ -839,7 +894,7 @@ const PATHOLOGIES_BASE = {
       motricite:"Incapacité conjuguée des deux yeux à regarder vers la droite, alors que le regard controlatéral, la vergence et les mouvements verticaux restent normaux. Contrairement à une paralysie du VI isolée, aucun œil ne peut dépasser la ligne médiane vers la droite, y compris en adduction.",
       pupille:"Normale.",
       paupiere:"Normale.",
-      convergence:"Convergence préservée malgré l'impossibilité de regard conjugué vers la droite — la commande de convergence emprunte une voie mésencéphalique distincte de la FRPP."
+      convergence:"Convergence préservée malgré l'impossibilité de regard conjugué vers la droite : la commande de convergence emprunte une voie mésencéphalique distincte de la FRPP."
     },
     localisation:"Centre de la latéralité du regard pontique (formation réticulée pontique paramédiane, FRPP) droite, ou son afférence corticale frontale.",
     mecanisme:"La FRPP droite commande le regard conjugué vers la droite en activant simultanément le noyau du VI droit et, via le FLM, le sous-noyau du droit médial du III controlatéral. Sa lésion abolit tout mouvement conjugué vers ce côté, à distinguer d'une simple atteinte du VI qui n'affecte qu'un seul œil."
@@ -862,7 +917,7 @@ const PATHOLOGIES_BASE = {
     }),
     nystagmus:{eyes:["OS"], fastSign:1, dir:"pos", threshold:0.18, freq:3.2, amp:0.16, suppressFactor:1, alexander:false},
     findings:{
-      motricite:"L'œil droit est quasi immobile sur le plan horizontal : il ne peut ni abduire (paralysie du regard conjugué ipsilatéral) ni adduire (OIN ipsilatérale associée), et repose souvent en légère exotropie. L'œil controlatéral conserve seulement l'abduction, avec un nystagmus de l'œil abducteur ; son adduction est elle aussi abolie au regard ipsilatéral. Au total, un seul des quatre mouvements horizontaux possibles reste préservé — l'abduction de l'œil controlatéral — d'où le nom « one-and-a-half ».",
+      motricite:"L'œil droit est quasi immobile sur le plan horizontal : il ne peut ni abduire (paralysie du regard conjugué ipsilatéral) ni adduire (OIN ipsilatérale associée), et repose souvent en légère exotropie. L'œil controlatéral conserve seulement l'abduction, avec un nystagmus de l'œil abducteur ; son adduction est elle aussi abolie au regard ipsilatéral. Au total, un seul des quatre mouvements horizontaux possibles reste préservé : l'abduction de l'œil controlatéral, d'où le nom « one-and-a-half ».",
       pupille:"Normale.",
       paupiere:"Normale.",
       convergence:"Classiquement préservée, comme dans l'OIN isolée, sauf lésion plus étendue touchant aussi la voie de la convergence."
@@ -1295,6 +1350,12 @@ const examA = createExamInstance({
   idPrefix:"a"
 });
 
+function retriggerAnim(el, cls){
+  el.classList.remove(cls);
+  void el.offsetWidth; // force reflow so the animation replays
+  el.classList.add(cls);
+}
+
 function renderInfo(container, key){
   const p = PATHOLOGIES[key];
   container.innerHTML = `
@@ -1307,6 +1368,7 @@ function renderInfo(container, key){
     <div class="info-block"><h3>localisation</h3><p>${p.localisation}</p></div>
     <div class="info-block"><h3>mécanisme</h3><p>${p.mecanisme}</p></div>
   `;
+  retriggerAnim(container, "anim-refresh");
 }
 
 function buildPathList(){
@@ -1331,6 +1393,12 @@ function buildPathList(){
         renderInfo(document.getElementById("info-a"), k);
         setSearchQuery(PATHOLOGIES[k].name);
         syncControlButtons("a", examA);
+        // on narrow screens the pathology list sits below the stage, so
+        // jump straight back up to it — no manual scrolling needed to see
+        // what the pathology just picked actually looks like
+        if(window.matchMedia("(max-width:980px)").matches){
+          document.querySelector("#view-apprendre .stage-card").scrollIntoView({behavior:"smooth", block:"start"});
+        }
       });
       wrap.appendChild(btn);
     });
@@ -1354,7 +1422,7 @@ function syncControlButtons(suffix, exam){
 }
 
 const MODE_HINTS = {
-  pursuit:"bouge le curseur pour la poursuite oculaire — amène-le près du bout du nez pour tester la convergence",
+  pursuit:"bouge le curseur pour la poursuite oculaire, amène-le près du bout du nez pour tester la convergence",
   lamp:"tiens la lampe tout près d'un œil pour l'éclairer, puis balance-la vers l'autre (test de la lampe balancée)"
 };
 
@@ -1434,6 +1502,7 @@ function newQuizQuestion(){
     <h2>Ton diagnostic ?</h2>
     <p style="font-family:'Space Grotesk',sans-serif;font-size:14px;line-height:1.6;color:var(--cream);">Explore le regard et la pupille du patient avec la souris, puis sélectionne une réponse dans la liste ci-dessous. L'explication clinique apparaîtra ici une fois ta réponse soumise.</p>
   `;
+  retriggerAnim(document.getElementById("info-q"), "anim-refresh");
 
   const distractorPool = PATH_KEYS.filter(k=>k!==key);
   const distractors = shuffle(distractorPool).slice(0,3);
@@ -1461,6 +1530,7 @@ function submitAnswer(chosenKey, btnEl){
   const correct = chosenKey === currentKey;
   if(correct) quizScore++;
   document.getElementById("score-chip").textContent = `score : ${quizScore} / ${quizTotal}`;
+  retriggerAnim(document.getElementById("score-chip"), "bump");
 
   document.querySelectorAll("#quiz-options .opt-btn").forEach(b=>{
     b.disabled = true;
